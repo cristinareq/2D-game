@@ -75,14 +75,7 @@ void Game::processInput()
 {
     sf::Event event;
 
-    // Declare the step variable outside of the switch statement
-    float step = 5.0f; // Adjust the step size as needed
-
-    // Create flags to track whether a key is currently pressed
-    static bool rightPressed = false;
-    static bool leftPressed = false;
-    static bool upPressed = false;
-    static bool downPressed = false;
+    float step = 5.0f; // Step size for movement
 
     while (window.pollEvent(event))
     {
@@ -92,34 +85,26 @@ void Game::processInput()
             window.close();
             break;
         case sf::Event::KeyPressed:
-            // Check if the corresponding key is already pressed
-            if (event.key.code == sf::Keyboard::Right && !rightPressed)
-            {
-                player.move(step, 0.0f); // Move right
-            }
-            else if (event.key.code == sf::Keyboard::Left && !leftPressed)
-            {
-                player.move(-step, 0.0f); // Move left
-            }
-            else if (event.key.code == sf::Keyboard::Up && !upPressed)
-            {
-                player.move(0.0f, -step); // Move up
-            }
-            else if (event.key.code == sf::Keyboard::Down && !downPressed)
-            {
-                player.move(0.0f, step); // Move down
-            }
-            break;
-        case sf::Event::KeyReleased:
-            // Reset the corresponding key flag when released
             if (event.key.code == sf::Keyboard::Right)
-                rightPressed = false;
+            {
+                if (player.getPosition().x + step + RADIUS <= SCENE_WIDTH)
+                    player.move(step, 0.0f); // Move right
+            }
             else if (event.key.code == sf::Keyboard::Left)
-                leftPressed = false;
+            {
+                if (player.getPosition().x - step - RADIUS >= 0)
+                    player.move(-step, 0.0f); // Move left
+            }
             else if (event.key.code == sf::Keyboard::Up)
-                upPressed = false;
+            {
+                if (player.getPosition().y - step - RADIUS >= 0)
+                    player.move(0.0f, -step); // Move up
+            }
             else if (event.key.code == sf::Keyboard::Down)
-                downPressed = false;
+            {
+                if (player.getPosition().y + step + RADIUS <= SCENE_HEIGHT)
+                    player.move(0.0f, step); // Move down
+            }
             break;
         default:
             break;
