@@ -7,7 +7,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-class Game {
+class Game
+{
 public:
     Game();
     int run();
@@ -24,6 +25,17 @@ private:
     static const float PLAYER_START_X;
     static const float PLAYER_START_Y;
     static const float RADIUS;
+
+    // Flags to track arrow key states
+    bool moveRight;
+    bool moveLeft;
+    bool moveUp;
+    bool moveDown;
+
+    bool rightPressed;
+    bool leftPressed;
+    bool upPressed;
+    bool downPressed;
 
     int initWindow();
     int initBackground();
