@@ -60,7 +60,7 @@ int Game::initWindow()
 
 int Game::initBackground()
 {
-    if (!backgroundTexture.loadFromFile("resources/background.png"))
+    if (!backgroundTexture.loadFromFile("resources/background2.png"))
     {
         return 1;
     }
