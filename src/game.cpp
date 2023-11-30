@@ -1,43 +1,63 @@
-/*
- * File: game.cpp
- * Author: Alessandra Gorla
- * Date: November 21, 2023
- * Description: Game class to deal with initialization and controller of 2D my game application.
- */
 #include "game.h"
 #include <iostream>
 
-const float Game::SCENE_WIDTH = 800.0f;
-const float Game::SCENE_HEIGHT = 600.0f;
-const float Game::PLAYER_START_X = 400.0f;
-const float Game::PLAYER_START_Y = 300.0f;
+class Wall
+{
+public:
+    float x, y, width, height;
+
+    static std::vector<Wall> createWalls()
+    {
+        std::vector<Wall> walls;
+
+        Wall wall1;
+        wall1.x = 200.0f;
+        wall1.y = 100.0f;
+        wall1.width = 20.0f;
+        wall1.height = 200.0f;
+
+        Wall wall2;
+        wall2.x = 400.0f;
+        wall2.y = 300.0f;
+        wall2.width = 300.0f;
+        wall2.height = 20.0f;
+
+        walls.push_back(wall1);
+        walls.push_back(wall2);
+
+        return walls;
+    }
+};
+
+std::vector<Wall> walls = Wall::createWalls();
+
+const float Game::SCENE_WIDTH = 1000.0f;
+const float Game::SCENE_HEIGHT = 800.0f;
+const float Game::PLAYER_START_X = 500.0f;
+const float Game::PLAYER_START_Y = 400.0f;
 const float Game::RADIUS = 40.0f;
 
-Game::Game()
+Game::Game() : lastDirection(Direction::None), leftBlocked(false), rightBlocked(false), upBlocked(false), downBlocked(false)
 {
     initWindow();
     initBackground();
     initPlayer();
 
-    // Set movement flags to false initially
+    player.setPosition(PLAYER_START_X, PLAYER_START_Y);
+
     rightPressed = false;
     leftPressed = false;
     upPressed = false;
     downPressed = false;
 }
 
-/**
- * Window initializer.
- */
 int Game::initWindow()
 {
-    window.create(sf::VideoMode(SCENE_WIDTH, SCENE_HEIGHT), "My 2D game");
+    window.create(sf::VideoMode(SCENE_WIDTH, SCENE_HEIGHT), "Updated 2D Game");
     window.setFramerateLimit(120);
     return 0;
 }
-/**
- * Background initializer.
- */
+
 int Game::initBackground()
 {
     if (!backgroundTexture.loadFromFile("resources/background.png"))
@@ -50,15 +70,10 @@ int Game::initBackground()
     return 0;
 }
 
-/**
- * Player (e.g. PacMan) initializer
- * @return 0 if successfully initialized, 1 otherwise
- */
 int Game::initPlayer()
 {
     player.setRadius(RADIUS);
     player.setOrigin(RADIUS, RADIUS);
-    player.setPosition(PLAYER_START_X, PLAYER_START_Y);
     if (!playerTexture.loadFromFile("resources/pacman.png"))
     {
         return 1;
@@ -67,15 +82,79 @@ int Game::initPlayer()
     return 0;
 }
 
-/**
- * Dealing with events on window.
- */
+void Game::update()
+{
+    float speed = 1.0f;
+
+    bool leftWallCollision = false;
+    bool rightWallCollision = false;
+    bool upWallCollision = false;
+    bool downWallCollision = false;
+
+    sf::FloatRect playerBounds = player.getGlobalBounds();
+
+    for (const auto &wall : walls)
+    {
+        sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
+
+        if (playerBounds.intersects(wallBounds))
+        {
+            if (player.getPosition().x < wall.x)
+            {
+                rightWallCollision = true;
+            }
+            else if (player.getPosition().x > wall.x + wall.width)
+            {
+                leftWallCollision = true;
+            }
+
+            if (player.getPosition().y < wall.y)
+            {
+                downWallCollision = true;
+            }
+            else if (player.getPosition().y > wall.y + wall.height)
+            {
+                upWallCollision = true;
+            }
+        }
+    }
+
+    if (!leftWallCollision && leftPressed)
+    {
+        if (player.getPosition().x - speed - RADIUS >= 0)
+        {
+            player.move(-speed, 0.0f);
+        }
+    }
+
+    if (!rightWallCollision && rightPressed)
+    {
+        if (player.getPosition().x + speed + RADIUS <= SCENE_WIDTH)
+        {
+            player.move(speed, 0.0f);
+        }
+    }
+
+    if (!upWallCollision && upPressed)
+    {
+        if (player.getPosition().y - speed - RADIUS >= 0)
+        {
+            player.move(0.0f, -speed);
+        }
+    }
+
+    if (!downWallCollision && downPressed)
+    {
+        if (player.getPosition().y + speed + RADIUS <= SCENE_HEIGHT)
+        {
+            player.move(0.0f, speed);
+        }
+    }
+}
 
 void Game::processInput()
 {
     sf::Event event;
-
-    float step = 5.0f; // Step size for movement
 
     while (window.pollEvent(event))
     {
@@ -85,25 +164,61 @@ void Game::processInput()
             window.close();
             break;
         case sf::Event::KeyPressed:
-            if (event.key.code == sf::Keyboard::Right)
+            if (event.key.code == sf::Keyboard::Left)
             {
-                if (player.getPosition().x + step + RADIUS <= SCENE_WIDTH)
-                    player.move(step, 0.0f); // Move right
+                if (!leftBlocked)
+                {
+                    leftPressed = true;
+                    lastDirection = Direction::Left;
+                    rightPressed = false;
+                    upPressed = false;
+                    downPressed = false;
+                    rightBlocked = false;
+                    upBlocked = false;
+                    downBlocked = false;
+                }
             }
-            else if (event.key.code == sf::Keyboard::Left)
+            else if (event.key.code == sf::Keyboard::Right)
             {
-                if (player.getPosition().x - step - RADIUS >= 0)
-                    player.move(-step, 0.0f); // Move left
+                if (!rightBlocked)
+                {
+                    rightPressed = true;
+                    lastDirection = Direction::Right;
+                    leftPressed = false;
+                    upPressed = false;
+                    downPressed = false;
+                    leftBlocked = false;
+                    upBlocked = false;
+                    downBlocked = false;
+                }
             }
             else if (event.key.code == sf::Keyboard::Up)
             {
-                if (player.getPosition().y - step - RADIUS >= 0)
-                    player.move(0.0f, -step); // Move up
+                if (!upBlocked)
+                {
+                    upPressed = true;
+                    lastDirection = Direction::Up;
+                    leftPressed = false;
+                    rightPressed = false;
+                    downPressed = false;
+                    leftBlocked = false;
+                    rightBlocked = false;
+                    downBlocked = false;
+                }
             }
             else if (event.key.code == sf::Keyboard::Down)
             {
-                if (player.getPosition().y + step + RADIUS <= SCENE_HEIGHT)
-                    player.move(0.0f, step); // Move down
+                if (!downBlocked)
+                {
+                    downPressed = true;
+                    lastDirection = Direction::Down;
+                    leftPressed = false;
+                    rightPressed = false;
+                    upPressed = false;
+                    leftBlocked = false;
+                    rightBlocked = false;
+                    upBlocked = false;
+                }
             }
             break;
         default:
@@ -112,26 +227,6 @@ void Game::processInput()
     }
 }
 
-/**
- * Function to update the position of the player
- */
-void Game::update()
-{
-    float speed = 5.0f; // Adjust movement speed if needed
-
-    if (moveRight)
-        printf("right key pressed\n");
-    if (moveLeft)
-        player.move(-speed, 0.0f); // Move left
-    if (moveUp)
-        player.move(0.0f, -speed); // Move up
-    if (moveDown)
-        player.move(0.0f, speed); // Move down
-}
-
-/**
- * Render elements in the window
- */
 void Game::render()
 {
     window.clear(sf::Color::White);
@@ -139,9 +234,7 @@ void Game::render()
     window.draw(player);
     window.display();
 }
-/**
- * Main function to deal with events, update the player and render the updated scene on the window.
- */
+
 int Game::run()
 {
     while (window.isOpen())

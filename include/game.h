@@ -1,11 +1,14 @@
-/*
- * File: game.h
- * Author: Alessandra Gorla
- * Date: November 21, 2023
- * Description: Game class header.
- */
 #pragma once
 #include <SFML/Graphics.hpp>
+
+enum class Direction
+{
+    None,
+    Left,
+    Right,
+    Up,
+    Down
+};
 
 class Game
 {
@@ -26,16 +29,17 @@ private:
     static const float PLAYER_START_Y;
     static const float RADIUS;
 
-    // Flags to track arrow key states
-    bool moveRight;
-    bool moveLeft;
-    bool moveUp;
-    bool moveDown;
-
     bool rightPressed;
     bool leftPressed;
     bool upPressed;
     bool downPressed;
+
+    bool leftBlocked;
+    bool rightBlocked;
+    bool upBlocked;
+    bool downBlocked;
+
+    Direction lastDirection;
 
     int initWindow();
     int initBackground();
