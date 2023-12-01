@@ -14,37 +14,37 @@ public:
         wall1.x = 200.0f;
         wall1.y = 100.0f;
         wall1.width = 20.0f;
-        wall1.height = 200.0f;
+        wall1.height = 202.0f;
 
         Wall wall2;
         wall2.x = 400.0f;
         wall2.y = 300.0f;
         wall2.width = 300.0f;
-        wall2.height = 20.0f;
+        wall2.height = 22.0f;
 
         Wall wall3;
         wall3.x = 131.0f;
         wall3.y = 600.0f;
         wall3.width = 300.0f;
-        wall3.height = 20.0f;
+        wall3.height = 22.0f;
 
         Wall wall4;
         wall4.x = 600.0f;
         wall4.y = 500.0f;
         wall4.width = 20.0f;
-        wall4.height = 200.0f;
+        wall4.height = 202.0f;
 
         Wall wall5;
         wall5.x = 750.0f;
         wall5.y = 140.0f;
         wall5.width = 100.0f;
-        wall5.height = 20.0f;
+        wall5.height = 22.0f;
 
         Wall wall6;
         wall6.x = 130.0f;
         wall6.y = 500.0f;
         wall6.width = 20.0f;
-        wall6.height = 100.0f;
+        wall6.height = 102.0f;
 
         walls.push_back(wall1);
         walls.push_back(wall2);
@@ -59,11 +59,11 @@ public:
 
 std::vector<Wall> walls = Wall::createWalls();
 
-const float Game::SCENE_WIDTH = 988.0f;
+const float Game::SCENE_WIDTH = 998.0f;
 const float Game::SCENE_HEIGHT = 800.0f;
 const float Game::PLAYER_START_X = 500.0f;
 const float Game::PLAYER_START_Y = 400.0f;
-const float Game::RADIUS = 40.0f;
+const float Game::RADIUS = 20.0f;
 
 Game::Game() : lastDirection(Direction::None), leftBlocked(false), rightBlocked(false), upBlocked(false), downBlocked(false)
 {
@@ -112,7 +112,7 @@ int Game::initPlayer()
 
 void Game::update()
 {
-    float speed = 1.0f;
+    float speed = 3.0f;
 
     bool leftWallCollision = false;
     bool rightWallCollision = false;
