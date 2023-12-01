@@ -1,5 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include <random>
 
 enum class Direction
 {
@@ -8,6 +10,17 @@ enum class Direction
     Right,
     Up,
     Down
+};
+
+class Ghost
+{
+public:
+    float x, y;
+    sf::Sprite sprite;
+
+    Ghost(float x, float y, const sf::Texture &texture);
+
+    void draw(sf::RenderWindow &window);
 };
 
 class Game
@@ -22,6 +35,12 @@ private:
     sf::Texture backgroundTexture;
     sf::Texture playerTexture;
     sf::CircleShape player;
+    sf::Texture ghostTexture;
+    std::vector<Ghost> ghosts;
+
+    std::random_device rd;
+    std::mt19937 rng;
+    std::uniform_real_distribution<float> distX, distY;
 
     static const float SCENE_WIDTH;
     static const float SCENE_HEIGHT;
@@ -47,4 +66,8 @@ private:
     void processInput();
     void update();
     void render();
+    void initGhosts();
+    void spawnNewGhost();
+    int initGhostTexture();
+    bool isValidPosition(float x, float y);
 };

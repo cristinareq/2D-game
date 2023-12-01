@@ -1,6 +1,21 @@
 #include "game.h"
 #include <iostream>
+#include <random>
 
+Ghost::Ghost(float x, float y, const sf::Texture &texture) : x(x), y(y)
+{
+    sprite.setTexture(texture);
+    float originalWidth = sprite.getLocalBounds().width;
+    float originalHeight = sprite.getLocalBounds().height;
+    float desiredSize = 40.0f;
+    sprite.setScale(desiredSize / originalWidth, desiredSize / originalHeight); // Scale the sprite
+    sprite.setPosition(x, y);
+}
+
+void Ghost::draw(sf::RenderWindow &window)
+{
+    window.draw(sprite);
+}
 class Wall
 {
 public:
@@ -9,50 +24,12 @@ public:
     static std::vector<Wall> createWalls()
     {
         std::vector<Wall> walls;
-
-        Wall wall1;
-        wall1.x = 200.0f;
-        wall1.y = 100.0f;
-        wall1.width = 20.0f;
-        wall1.height = 202.0f;
-
-        Wall wall2;
-        wall2.x = 400.0f;
-        wall2.y = 300.0f;
-        wall2.width = 300.0f;
-        wall2.height = 22.0f;
-
-        Wall wall3;
-        wall3.x = 131.0f;
-        wall3.y = 600.0f;
-        wall3.width = 300.0f;
-        wall3.height = 22.0f;
-
-        Wall wall4;
-        wall4.x = 600.0f;
-        wall4.y = 500.0f;
-        wall4.width = 20.0f;
-        wall4.height = 202.0f;
-
-        Wall wall5;
-        wall5.x = 750.0f;
-        wall5.y = 140.0f;
-        wall5.width = 100.0f;
-        wall5.height = 22.0f;
-
-        Wall wall6;
-        wall6.x = 130.0f;
-        wall6.y = 500.0f;
-        wall6.width = 20.0f;
-        wall6.height = 102.0f;
-
-        walls.push_back(wall1);
-        walls.push_back(wall2);
-        walls.push_back(wall3);
-        walls.push_back(wall4);
-        walls.push_back(wall5);
-        walls.push_back(wall6);
-
+        walls.push_back({200.0f, 100.0f, 20.0f, 202.0f});
+        walls.push_back({400.0f, 300.0f, 300.0f, 22.0f});
+        walls.push_back({131.0f, 600.0f, 300.0f, 22.0f});
+        walls.push_back({600.0f, 500.0f, 20.0f, 202.0f});
+        walls.push_back({750.0f, 140.0f, 100.0f, 22.0f});
+        walls.push_back({130.0f, 500.0f, 20.0f, 102.0f});
         return walls;
     }
 };
@@ -65,20 +42,31 @@ const float Game::PLAYER_START_X = 500.0f;
 const float Game::PLAYER_START_Y = 400.0f;
 const float Game::RADIUS = 20.0f;
 
-Game::Game() : lastDirection(Direction::None), leftBlocked(false), rightBlocked(false), upBlocked(false), downBlocked(false)
+Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT)
 {
     initWindow();
     initBackground();
     initPlayer();
+    initGhostTexture();
+    initGhosts(); // Make sure this is called after initGhostTexture
 
     player.setPosition(PLAYER_START_X, PLAYER_START_Y);
 
     rightPressed = false;
+
     leftPressed = false;
     upPressed = false;
     downPressed = false;
 }
 
+int Game::initGhostTexture()
+{
+    if (!ghostTexture.loadFromFile("resources/ghost.png"))
+    {
+        return 1; // Error loading texture
+    }
+    return 0; // Successfully loaded
+}
 int Game::initWindow()
 {
     window.create(sf::VideoMode(SCENE_WIDTH, SCENE_HEIGHT), "Updated 2D Game");
@@ -110,6 +98,20 @@ int Game::initPlayer()
     return 0;
 }
 
+void Game::initGhosts()
+{
+    for (int i = 0; i < 6; ++i)
+    {
+        float x, y;
+        do
+        {
+            x = distX(rng);
+            y = distY(rng);
+        } while (!isValidPosition(x, y)); // Updated to a new method
+        ghosts.emplace_back(x, y, ghostTexture);
+    }
+}
+
 void Game::update()
 {
     float speed = 3.0f;
@@ -124,7 +126,6 @@ void Game::update()
     for (const auto &wall : walls)
     {
         sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
-
         if (playerBounds.intersects(wallBounds))
         {
             if (player.getPosition().x < wall.x)
@@ -176,6 +177,19 @@ void Game::update()
         if (player.getPosition().y + speed + RADIUS <= SCENE_HEIGHT)
         {
             player.move(0.0f, speed);
+        }
+    }
+
+    for (auto it = ghosts.begin(); it != ghosts.end();)
+    {
+        if (player.getGlobalBounds().intersects(it->sprite.getGlobalBounds()))
+        {
+            it = ghosts.erase(it);
+            spawnNewGhost();
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -259,8 +273,59 @@ void Game::render()
 {
     window.clear(sf::Color::White);
     window.draw(background);
+
+    for (auto &ghost : ghosts)
+    {
+        ghost.draw(window); // Check if this method is called
+    }
+
     window.draw(player);
     window.display();
+}
+
+void Game::spawnNewGhost()
+{
+    float x, y;
+    do
+    {
+        x = distX(rng);
+        y = distY(rng);
+    } while (!isValidPosition(x, y));
+    ghosts.emplace_back(x, y, ghostTexture);
+}
+
+bool Game::isValidPosition(float x, float y)
+{
+    float ghostSize = 40.0f; // Size of the ghosts
+
+    // Check if the position is within the game window
+    if (x < 0 || x + ghostSize > SCENE_WIDTH || y < 0 || y + ghostSize > SCENE_HEIGHT)
+    {
+        return false;
+    }
+
+    sf::FloatRect newGhostBounds(x, y, ghostSize, ghostSize);
+
+    // Check for intersection with walls
+    for (const auto &wall : walls)
+    {
+        sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
+        if (newGhostBounds.intersects(wallBounds))
+        {
+            return false;
+        }
+    }
+
+    // Check for intersection with existing ghosts
+    for (const auto &ghost : ghosts)
+    {
+        if (newGhostBounds.intersects(ghost.sprite.getGlobalBounds()))
+        {
+            return false;
+        }
+    }
+
+    return true; // Position is valid if all checks are passed
 }
 
 int Game::run()
