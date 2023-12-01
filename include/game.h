@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <random>
+#include <chrono>
 
 enum class Direction
 {
@@ -42,6 +43,16 @@ private:
     std::mt19937 rng;
     std::uniform_real_distribution<float> distX, distY;
 
+    sf::Clock gameClock;
+    sf::Text timerText;
+    sf::Font font;
+
+    sf::Time lastUpdateTime;
+    static const sf::Time UpdateInterval;
+    static const std::string FONT_PATH;
+
+    int ghostsEaten;
+
     static const float SCENE_WIDTH;
     static const float SCENE_HEIGHT;
     static const float PLAYER_START_X;
@@ -67,7 +78,10 @@ private:
     void update();
     void render();
     void initGhosts();
+    void initTimer();
+    void updateTimer();
     void spawnNewGhost();
     int initGhostTexture();
     bool isValidPosition(float x, float y);
+    void resetMovementFlags();
 };

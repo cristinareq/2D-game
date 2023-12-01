@@ -30,25 +30,34 @@ public:
         walls.push_back({600.0f, 500.0f, 20.0f, 202.0f});
         walls.push_back({750.0f, 140.0f, 100.0f, 22.0f});
         walls.push_back({130.0f, 500.0f, 20.0f, 102.0f});
+        walls.push_back({800.0f, 400.0f, 100.0f, 20.0f});
+
+        // magic walls
+        walls.push_back({145.0f, 511.0f, 5.0f, 89.0f});
+        walls.push_back({762.0f, 140.0f, 76.0f, 5.0f});
+
         return walls;
     }
 };
 
 std::vector<Wall> walls = Wall::createWalls();
 
-const float Game::SCENE_WIDTH = 998.0f;
-const float Game::SCENE_HEIGHT = 800.0f;
+const float Game::SCENE_WIDTH = 1000.0f;
+const float Game::SCENE_HEIGHT = 801.0f;
 const float Game::PLAYER_START_X = 500.0f;
 const float Game::PLAYER_START_Y = 400.0f;
 const float Game::RADIUS = 20.0f;
+const sf::Time Game::UpdateInterval = sf::seconds(1.0f);
+const std::string Game::FONT_PATH = "/Users/cristina/Desktop/C++ folder game/2D-game/arial.ttf";
 
-Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT)
+Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), ghostsEaten(0)
 {
     initWindow();
     initBackground();
     initPlayer();
     initGhostTexture();
-    initGhosts(); // Make sure this is called after initGhostTexture
+    initGhosts();
+    initTimer(); // Initialize the timer
 
     player.setPosition(PLAYER_START_X, PLAYER_START_Y);
 
@@ -76,7 +85,7 @@ int Game::initWindow()
 
 int Game::initBackground()
 {
-    if (!backgroundTexture.loadFromFile("resources/background3.png"))
+    if (!backgroundTexture.loadFromFile("resources/background4.png"))
     {
         return 1;
     }
@@ -112,8 +121,22 @@ void Game::initGhosts()
     }
 }
 
+void Game::initTimer()
+{
+    if (!font.loadFromFile("/Users/cristina/Desktop/C++ folder game/2D-game/arial.ttf"))
+    {
+        std::cerr << "Failed to load font" << std::endl;
+        return; // Handle the error as appropriate
+    }
+
+    timerText.setFont(font);
+    timerText.setCharacterSize(24);
+    timerText.setFillColor(sf::Color::White);
+    timerText.setPosition(10, 10); // Set position on the screen
+}
 void Game::update()
 {
+    updateTimer();
     float speed = 3.0f;
 
     bool leftWallCollision = false;
@@ -123,27 +146,51 @@ void Game::update()
 
     sf::FloatRect playerBounds = player.getGlobalBounds();
 
+    sf::Time now = gameClock.getElapsedTime();
+    if (now - lastUpdateTime >= UpdateInterval)
+    {
+        lastUpdateTime = now;
+        timerText.setString("Time: " + std::to_string(static_cast<int>(now.asSeconds())));
+    }
+
     for (const auto &wall : walls)
     {
         sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
         if (playerBounds.intersects(wallBounds))
         {
-            if (player.getPosition().x < wall.x)
-            {
-                rightWallCollision = true;
-            }
-            else if (player.getPosition().x > wall.x + wall.width)
-            {
-                leftWallCollision = true;
-            }
 
-            if (player.getPosition().y < wall.y)
+            // Check if it's one of the special walls
+            if (wall.x == 145.0f && wall.y == 511.0f) // First special wall
             {
-                downWallCollision = true;
+                player.setPosition(800.0f, 120.0f - RADIUS * 2);
+                resetMovementFlags();
+                upPressed = true;
             }
-            else if (player.getPosition().y > wall.y + wall.height)
+            else if (wall.x == 762.0f && wall.y == 140.0f) // Second special wall
             {
-                upWallCollision = true;
+                player.setPosition(115.0f + wall.width + RADIUS * 2, 551.0f);
+                resetMovementFlags();
+                rightPressed = true;
+            }
+            else
+            {
+                if (player.getPosition().x < wall.x)
+                {
+                    rightWallCollision = true;
+                }
+                else if (player.getPosition().x > wall.x + wall.width)
+                {
+                    leftWallCollision = true;
+                }
+
+                if (player.getPosition().y < wall.y)
+                {
+                    downWallCollision = true;
+                }
+                else if (player.getPosition().y > wall.y + wall.height)
+                {
+                    upWallCollision = true;
+                }
             }
         }
     }
@@ -186,6 +233,7 @@ void Game::update()
         {
             it = ghosts.erase(it);
             spawnNewGhost();
+            ghostsEaten++; // Increment the count
         }
         else
         {
@@ -194,6 +242,23 @@ void Game::update()
     }
 }
 
+void Game::updateTimer()
+{
+    sf::Time now = gameClock.getElapsedTime();
+    if (now - lastUpdateTime >= UpdateInterval)
+    {
+        lastUpdateTime = now;
+        timerText.setString("Time: " + std::to_string(static_cast<int>(now.asSeconds())));
+    }
+}
+
+void Game::resetMovementFlags()
+{
+    leftPressed = false;
+    rightPressed = false;
+    upPressed = false;
+    downPressed = false;
+}
 void Game::processInput()
 {
     sf::Event event;
@@ -279,7 +344,13 @@ void Game::render()
         ghost.draw(window); // Check if this method is called
     }
 
+    std::string displayText = "Time: " + std::to_string(static_cast<int>(gameClock.getElapsedTime().asSeconds()));
+    displayText += " | Ghosts Eaten: " + std::to_string(ghostsEaten);
+    timerText.setString(displayText);
+
     window.draw(player);
+    window.draw(timerText); // Draw the timer
+
     window.display();
 }
 
