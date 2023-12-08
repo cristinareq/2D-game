@@ -50,7 +50,7 @@ const float Game::RADIUS = 20.0f;
 const sf::Time Game::UpdateInterval = sf::seconds(1.0f);
 const std::string Game::FONT_PATH = "/Users/cristina/Desktop/C++ folder game/2D-game/arial.ttf";
 
-Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), ghostsEaten(0)
+Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), ghostsEaten(0), wallCollisions(0) // Initialize wallCollisions
 {
     initWindow();
     initBackground();
@@ -144,6 +144,8 @@ void Game::update()
     bool upWallCollision = false;
     bool downWallCollision = false;
 
+    bool newCollision = false;
+
     sf::FloatRect playerBounds = player.getGlobalBounds();
 
     sf::Time now = gameClock.getElapsedTime();
@@ -152,12 +154,25 @@ void Game::update()
         lastUpdateTime = now;
         timerText.setString("Time: " + std::to_string(static_cast<int>(now.asSeconds())));
     }
+    std::string displayText = "Time: " + std::to_string(static_cast<int>(gameClock.getElapsedTime().asSeconds()));
+    displayText += " | Ghosts Eaten: " + std::to_string(ghostsEaten);
+    displayText += " | Wall Collisions: " + std::to_string(wallCollisions);
+    timerText.setString(displayText);
+
+    // Check for end game condition
 
     for (const auto &wall : walls)
     {
         sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
         if (playerBounds.intersects(wallBounds))
         {
+            // Check if the wall is a red wall
+            bool isRedWall = (wall.x == 145.0f && wall.y == 511.0f) || (wall.x == 762.0f && wall.y == 140.0f);
+
+            if (!isColliding && !isRedWall)
+            {
+                newCollision = true;
+            }
 
             // Check if it's one of the special walls
             if (wall.x == 145.0f && wall.y == 511.0f) // First special wall
@@ -192,6 +207,26 @@ void Game::update()
                     upWallCollision = true;
                 }
             }
+            isColliding = true;
+        }
+    }
+
+    if (isColliding)
+    {
+        bool stillColliding = false;
+        for (const auto &wall : walls)
+        {
+            sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
+            if (playerBounds.intersects(wallBounds))
+            {
+                stillColliding = true;
+                break;
+            }
+        }
+
+        if (!stillColliding)
+        {
+            isColliding = false;
         }
     }
 
@@ -238,6 +273,19 @@ void Game::update()
         else
         {
             ++it;
+        }
+    }
+    if (newCollision)
+    {
+        wallCollisions++;
+        if (wallCollisions >= 5)
+        {
+            update();
+            render();
+            sf::sleep(sf::seconds(1));
+
+            endGame();
+            return;
         }
     }
 }
@@ -337,19 +385,26 @@ void Game::processInput()
 void Game::render()
 {
     window.clear(sf::Color::White);
-    window.draw(background);
 
-    for (auto &ghost : ghosts)
+    // Draw the standard or the end game background based on the game state
+    if (!gameEnded)
     {
-        ghost.draw(window); // Check if this method is called
+        window.draw(background);
+
+        for (auto &ghost : ghosts)
+        {
+            ghost.draw(window);
+        }
+
+        window.draw(player);
+    }
+    else
+    {
+        window.draw(endGameBackground);
     }
 
-    std::string displayText = "Time: " + std::to_string(static_cast<int>(gameClock.getElapsedTime().asSeconds()));
-    displayText += " | Ghosts Eaten: " + std::to_string(ghostsEaten);
-    timerText.setString(displayText);
-
-    window.draw(player);
-    window.draw(timerText); // Draw the timer
+    // Always draw the timerText on top, so it's visible in both game states
+    window.draw(timerText);
 
     window.display();
 }
@@ -408,4 +463,28 @@ int Game::run()
         render();
     }
     return 0;
+}
+void Game::endGame()
+{
+
+    if (!endGameBackgroundTexture.loadFromFile("resources/background000.png"))
+    {
+        std::cerr << "Failed to load end game background" << std::endl;
+        return;
+    }
+    // Set the texture for the end game background
+    endGameBackground.setTexture(endGameBackgroundTexture);
+
+    // Scale the sprite to cover the entire window
+    float scaleX = SCENE_WIDTH / endGameBackgroundTexture.getSize().x;
+    float scaleY = SCENE_HEIGHT / endGameBackgroundTexture.getSize().y;
+    endGameBackground.setScale(scaleX, scaleY);
+
+    gameEnded = true; // Set the game ended flag
+
+    render(); // Render one last time with the new background
+
+    sf::sleep(sf::seconds(10)); // Wait for 10 seconds
+
+    window.close(); // Close the game window
 }

@@ -39,6 +39,10 @@ private:
     sf::Texture ghostTexture;
     std::vector<Ghost> ghosts;
 
+    sf::Sprite endGameBackground;
+    sf::Texture endGameBackgroundTexture;
+    bool gameEnded = false;
+
     std::random_device rd;
     std::mt19937 rng;
     std::uniform_real_distribution<float> distX, distY;
@@ -52,6 +56,8 @@ private:
     static const std::string FONT_PATH;
 
     int ghostsEaten;
+    int wallCollisions;
+    bool isColliding;
 
     static const float SCENE_WIDTH;
     static const float SCENE_HEIGHT;
@@ -84,4 +90,5 @@ private:
     int initGhostTexture();
     bool isValidPosition(float x, float y);
     void resetMovementFlags();
+    void endGame();
 };
