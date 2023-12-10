@@ -22,6 +22,7 @@ public:
     Ghost(float x, float y, const sf::Texture &texture);
 
     void draw(sf::RenderWindow &window);
+    void updateghost(float maxX, float maxY, const std::vector<sf::FloatRect> &walls, std::mt19937 &rng); // Added line
 };
 
 class Game

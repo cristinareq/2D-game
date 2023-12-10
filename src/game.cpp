@@ -67,6 +67,48 @@ Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), g
     upPressed = false;
     downPressed = false;
 }
+void Ghost::updateghost(float maxX, float maxY, const std::vector<sf::FloatRect> &walls, std::mt19937 &rng)
+{
+    // Define the step size for each movement
+    const float stepSize = 3.0f;
+
+    // Create distributions for random movement
+    std::uniform_real_distribution<float> distX(-stepSize, stepSize);
+    std::uniform_real_distribution<float> distY(-stepSize, stepSize);
+
+    // Variables to hold the new position
+    float newX, newY;
+    bool validPosition = false;
+
+    while (!validPosition)
+    {
+        newX = x + distX(rng); // Random step in X
+        newY = y + distY(rng); // Random step in Y
+
+        // Clamp the new position within the game bounds
+        newX = std::max(0.0f, std::min(newX, maxX - sprite.getLocalBounds().width * sprite.getScale().x));
+        newY = std::max(0.0f, std::min(newY, maxY - sprite.getLocalBounds().height * sprite.getScale().y));
+
+        // Create a rectangle for the new position to check for wall collisions
+        sf::FloatRect newBounds(newX, newY, sprite.getLocalBounds().width * sprite.getScale().x, sprite.getLocalBounds().height * sprite.getScale().y);
+
+        // Check for collisions with walls
+        validPosition = true;
+        for (const auto &wall : walls)
+        {
+            if (newBounds.intersects(wall))
+            {
+                validPosition = false;
+                break;
+            }
+        }
+    }
+
+    // Update ghost position
+    x = newX;
+    y = newY;
+    sprite.setPosition(x, y);
+}
 
 int Game::initGhostTexture()
 {
@@ -163,6 +205,16 @@ void Game::update()
 
     for (const auto &wall : walls)
     {
+        std::vector<sf::FloatRect> wallRects;
+        for (const Wall &wall : walls)
+        {
+            wallRects.emplace_back(wall.x, wall.y, wall.width, wall.height);
+        }
+
+        for (Ghost &ghost : ghosts)
+        {
+            ghost.updateghost(SCENE_WIDTH, SCENE_HEIGHT, wallRects, rng); // Added line
+        }
         sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
         if (playerBounds.intersects(wallBounds))
         {
