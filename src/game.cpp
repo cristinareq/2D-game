@@ -2,7 +2,7 @@
 #include <iostream>
 #include <random>
 
-Ghost::Ghost(float x, float y, const sf::Texture &texture) : x(x), y(y)
+Ghost::Ghost(float x, float y, const sf::Texture &texture) : x(x), y(y), moveTimer(sf::Time::Zero)
 {
     sprite.setTexture(texture);
     float originalWidth = sprite.getLocalBounds().width;
@@ -67,47 +67,53 @@ Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), g
     upPressed = false;
     downPressed = false;
 }
-void Ghost::updateghost(float maxX, float maxY, const std::vector<sf::FloatRect> &walls, std::mt19937 &rng)
+void Ghost::updateghost(float maxX, float maxY, const std::vector<sf::FloatRect> &walls, std::mt19937 &rng, sf::Time elapsedTime)
 {
-    // Define the step size for each movement
-    const float stepSize = 3.0f;
+    moveTimer += elapsedTime;
 
-    // Create distributions for random movement
-    std::uniform_real_distribution<float> distX(-stepSize, stepSize);
-    std::uniform_real_distribution<float> distY(-stepSize, stepSize);
-
-    // Variables to hold the new position
-    float newX, newY;
-    bool validPosition = false;
-
-    while (!validPosition)
+    if (moveTimer.asSeconds() >= 0.1f)
     {
-        newX = x + distX(rng); // Random step in X
-        newY = y + distY(rng); // Random step in Y
+        // Define the step size for each movement
+        const float stepSize = 30.0f;
 
-        // Clamp the new position within the game bounds
-        newX = std::max(0.0f, std::min(newX, maxX - sprite.getLocalBounds().width * sprite.getScale().x));
-        newY = std::max(0.0f, std::min(newY, maxY - sprite.getLocalBounds().height * sprite.getScale().y));
+        // Create distributions for random movement
+        std::uniform_real_distribution<float> distX(-stepSize, stepSize);
+        std::uniform_real_distribution<float> distY(-stepSize, stepSize);
 
-        // Create a rectangle for the new position to check for wall collisions
-        sf::FloatRect newBounds(newX, newY, sprite.getLocalBounds().width * sprite.getScale().x, sprite.getLocalBounds().height * sprite.getScale().y);
+        // Variables to hold the new position
+        float newX, newY;
+        bool validPosition = false;
 
-        // Check for collisions with walls
-        validPosition = true;
-        for (const auto &wall : walls)
+        while (!validPosition)
         {
-            if (newBounds.intersects(wall))
+            newX = x + distX(rng); // Random step in X
+            newY = y + distY(rng); // Random step in Y
+
+            // Clamp the new position within the game bounds
+            newX = std::max(0.0f, std::min(newX, maxX - sprite.getLocalBounds().width * sprite.getScale().x));
+            newY = std::max(0.0f, std::min(newY, maxY - sprite.getLocalBounds().height * sprite.getScale().y));
+
+            // Create a rectangle for the new position to check for wall collisions
+            sf::FloatRect newBounds(newX, newY, sprite.getLocalBounds().width * sprite.getScale().x, sprite.getLocalBounds().height * sprite.getScale().y);
+
+            // Check for collisions with walls
+            validPosition = true;
+            for (const auto &wall : walls)
             {
-                validPosition = false;
-                break;
+                if (newBounds.intersects(wall))
+                {
+                    validPosition = false;
+                    break;
+                }
             }
         }
-    }
 
-    // Update ghost position
-    x = newX;
-    y = newY;
-    sprite.setPosition(x, y);
+        // Update ghost position
+        x = newX;
+        y = newY;
+        sprite.setPosition(x, y);
+        moveTimer = sf::Time::Zero; // Reset the timer here
+    }
 }
 
 int Game::initGhostTexture()
@@ -205,6 +211,8 @@ void Game::update()
 
     for (const auto &wall : walls)
     {
+        sf::Time elapsedTime = gameClock.restart(); // Restart the clock and get the elapsed time
+
         std::vector<sf::FloatRect> wallRects;
         for (const Wall &wall : walls)
         {
@@ -213,8 +221,9 @@ void Game::update()
 
         for (Ghost &ghost : ghosts)
         {
-            ghost.updateghost(SCENE_WIDTH, SCENE_HEIGHT, wallRects, rng); // Added line
+            ghost.updateghost(SCENE_WIDTH, SCENE_HEIGHT, wallRects, rng, elapsedTime); // Pass the elapsed time to updateghost
         }
+
         sf::FloatRect wallBounds(wall.x, wall.y, wall.width, wall.height);
         if (playerBounds.intersects(wallBounds))
         {
