@@ -79,6 +79,11 @@ private:
     bool upBlocked;
     bool downBlocked;
 
+    bool touchingLeftBorder = false;
+    bool touchingRightBorder = false;
+    bool touchingTopBorder = false;
+    bool touchingBottomBorder = false;
+
     Direction lastDirection;
 
     int initWindow();

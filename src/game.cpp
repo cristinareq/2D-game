@@ -1,3 +1,4 @@
+
 #include "game.h"
 #include <iostream>
 #include <random>
@@ -71,10 +72,10 @@ void Ghost::updateghost(float maxX, float maxY, const std::vector<sf::FloatRect>
 {
     moveTimer += elapsedTime;
 
-    if (moveTimer.asSeconds() >= 0.1f)
+    if (moveTimer.asSeconds() >= 1.0f)
     {
         // Define the step size for each movement
-        const float stepSize = 30.0f;
+        const float stepSize = 50.0f; // SPEED FOR GHOST SPEED
 
         // Create distributions for random movement
         std::uniform_real_distribution<float> distX(-stepSize, stepSize);
@@ -86,8 +87,14 @@ void Ghost::updateghost(float maxX, float maxY, const std::vector<sf::FloatRect>
 
         while (!validPosition)
         {
-            newX = x + distX(rng); // Random step in X
-            newY = y + distY(rng); // Random step in Y
+            newX = (x + distX(rng));
+            newX = (x + distX(rng));
+            newX = (x + distX(rng));
+            newX = (x + distX(rng)); // Random step in X
+            newY = (y + distY(rng));
+            newY = (y + distY(rng));
+            newY = (y + distY(rng));
+            newY = (y + distY(rng)); // Random step in Y
 
             // Clamp the new position within the game bounds
             newX = std::max(0.0f, std::min(newX, maxX - sprite.getLocalBounds().width * sprite.getScale().x));
@@ -184,7 +191,10 @@ void Game::initTimer()
 }
 void Game::update()
 {
+    sf::Time elapsedTime = gameClock.restart();
+
     updateTimer();
+
     float speed = 3.0f;
 
     bool leftWallCollision = false;
@@ -195,6 +205,59 @@ void Game::update()
     bool newCollision = false;
 
     sf::FloatRect playerBounds = player.getGlobalBounds();
+
+    // Check for border collisions
+    if (player.getPosition().x - RADIUS <= 0)
+    {
+        if (!touchingLeftBorder)
+        {
+            wallCollisions++;
+            touchingLeftBorder = true;
+        }
+    }
+    else
+    {
+        touchingLeftBorder = false;
+    }
+
+    if (player.getPosition().x + RADIUS >= SCENE_WIDTH)
+    {
+        if (!touchingRightBorder)
+        {
+            wallCollisions++;
+            touchingRightBorder = true;
+        }
+    }
+    else
+    {
+        touchingRightBorder = false;
+    }
+
+    if (player.getPosition().y - RADIUS <= 0)
+    {
+        if (!touchingTopBorder)
+        {
+            wallCollisions++;
+            touchingTopBorder = true;
+        }
+    }
+    else
+    {
+        touchingTopBorder = false;
+    }
+
+    if (player.getPosition().y + RADIUS >= SCENE_HEIGHT)
+    {
+        if (!touchingBottomBorder)
+        {
+            wallCollisions++;
+            touchingBottomBorder = true;
+        }
+    }
+    else
+    {
+        touchingBottomBorder = false;
+    }
 
     sf::Time now = gameClock.getElapsedTime();
     if (now - lastUpdateTime >= UpdateInterval)
@@ -211,8 +274,6 @@ void Game::update()
 
     for (const auto &wall : walls)
     {
-        sf::Time elapsedTime = gameClock.restart(); // Restart the clock and get the elapsed time
-
         std::vector<sf::FloatRect> wallRects;
         for (const Wall &wall : walls)
         {
@@ -266,6 +327,17 @@ void Game::update()
                 else if (player.getPosition().y > wall.y + wall.height)
                 {
                     upWallCollision = true;
+                }
+            }
+            if (playerBounds.intersects(wallBounds))
+            {
+                // Check if the wall is a red wall
+                bool isRedWall = (wall.x == 145.0f && wall.y == 511.0f) || (wall.x == 762.0f && wall.y == 140.0f);
+
+                // Decrement wallCollisions if it's a red wall
+                if (isRedWall)
+                {
+                    wallCollisions = std::max(0, wallCollisions - 1);
                 }
             }
             isColliding = true;
@@ -483,7 +555,7 @@ void Game::spawnNewGhost()
 
 bool Game::isValidPosition(float x, float y)
 {
-    float ghostSize = 40.0f; // Size of the ghosts
+    float ghostSize = 50.0f; // Size of the ghosts
 
     // Check if the position is within the game window
     if (x < 0 || x + ghostSize > SCENE_WIDTH || y < 0 || y + ghostSize > SCENE_HEIGHT)
@@ -521,6 +593,7 @@ int Game::run()
     {
         processInput();
         update();
+        updateTimer();
         render();
     }
     return 0;
