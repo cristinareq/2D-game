@@ -49,7 +49,7 @@ const float Game::PLAYER_START_X = 500.0f;
 const float Game::PLAYER_START_Y = 400.0f;
 const float Game::RADIUS = 20.0f;
 const sf::Time Game::UpdateInterval = sf::seconds(1.0f);
-const std::string Game::FONT_PATH = "/Users/cristina/Desktop/C++ folder game/2D-game/arial.ttf";
+const std::string Game::FONT_PATH = "arial.ttf";
 
 Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), ghostsEaten(0), wallCollisions(0) // Initialize wallCollisions
 {
@@ -178,7 +178,7 @@ void Game::initGhosts()
 
 void Game::initTimer()
 {
-    if (!font.loadFromFile("/Users/cristina/Desktop/C++ folder game/2D-game/arial.ttf"))
+    if (!font.loadFromFile("arial.ttf"))
     {
         std::cerr << "Failed to load font" << std::endl;
         return; // Handle the error as appropriate
@@ -265,10 +265,15 @@ void Game::update()
         lastUpdateTime = now;
         timerText.setString("Time: " + std::to_string(static_cast<int>(now.asSeconds())));
     }
-    std::string displayText = "Time: " + std::to_string(static_cast<int>(gameClock.getElapsedTime().asSeconds()));
-    displayText += " | Ghosts Eaten: " + std::to_string(ghostsEaten);
+
+    std::string displayText = "  Ghosts Eaten: " + std::to_string(ghostsEaten);
     displayText += " | Wall Collisions: " + std::to_string(wallCollisions);
     timerText.setString(displayText);
+
+    /*std::string displayText = "Time: " + std::to_string(static_cast<int>(gameClock.getElapsedTime().asSeconds()));
+    displayText += " | Ghosts Eaten: " + std::to_string(ghostsEaten);
+    displayText += " | Wall Collisions: " + std::to_string(wallCollisions);
+    timerText.setString(displayText);*/
 
     // Check for end game condition
 
@@ -411,11 +416,11 @@ void Game::update()
     if (newCollision)
     {
         wallCollisions++;
-        if (wallCollisions >= 5)
+        if (wallCollisions >= 3)
         {
             update();
             render();
-            sf::sleep(sf::seconds(1));
+            sf::sleep(sf::seconds(0.5));
 
             endGame();
             return;
@@ -618,7 +623,7 @@ void Game::endGame()
 
     render(); // Render one last time with the new background
 
-    sf::sleep(sf::seconds(10)); // Wait for 10 seconds
+    sf::sleep(sf::seconds(1)); // Wait for 10 seconds
 
     window.close(); // Close the game window
 }

@@ -132,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/cristina/Desktop/C++ folder game/2D-game/CMakeFiles" "/Users/cristina/Desktop/C++ folder game/2D-game//CMakeFiles/progress.marks"
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(CMAKE_COMMAND) -E cmake_progress_start "/Users/cristina/Desktop/C++ folder game/2D-game/CMakeFiles" "/Users/cristina/Desktop/C++ folder game/2D-game/_deps/googletest-build/googlemock//CMakeFiles/progress.marks"
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/all
 	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/cristina/Desktop/C++ folder game/2D-game/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
 clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,168 +148,94 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-#=============================================================================
-# Target rules for targets named 2D_game_assignment
+# Convenience name for target.
+_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/rule:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/rule
+.PHONY : _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/rule
 
-# Build rule for target.
-2D_game_assignment: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 2D_game_assignment
-.PHONY : 2D_game_assignment
-
-# fast build rule for target.
-2D_game_assignment/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/2D_game_assignment.dir/build.make CMakeFiles/2D_game_assignment.dir/build
-.PHONY : 2D_game_assignment/fast
-
-#=============================================================================
-# Target rules for targets named game_tests
-
-# Build rule for target.
-game_tests: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 game_tests
-.PHONY : game_tests
-
-# fast build rule for target.
-game_tests/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_tests.dir/build.make CMakeFiles/game_tests.dir/build
-.PHONY : game_tests/fast
-
-#=============================================================================
-# Target rules for targets named gmock
-
-# Build rule for target.
-gmock: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gmock
+# Convenience name for target.
+gmock: _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/rule
 .PHONY : gmock
 
 # fast build rule for target.
 gmock/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build
 .PHONY : gmock/fast
 
-#=============================================================================
-# Target rules for targets named gmock_main
+# Convenience name for target.
+_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule
+.PHONY : _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule
 
-# Build rule for target.
-gmock_main: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gmock_main
+# Convenience name for target.
+gmock_main: _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule
 .PHONY : gmock_main
 
 # fast build rule for target.
 gmock_main/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build
 .PHONY : gmock_main/fast
 
-#=============================================================================
-# Target rules for targets named gtest
-
-# Build rule for target.
-gtest: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gtest
-.PHONY : gtest
-
-# fast build rule for target.
-gtest/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest.dir/build
-.PHONY : gtest/fast
-
-#=============================================================================
-# Target rules for targets named gtest_main
-
-# Build rule for target.
-gtest_main: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gtest_main
-.PHONY : gtest_main
-
-# fast build rule for target.
-gtest_main/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/build
-.PHONY : gtest_main/fast
-
-src/game.o: src/game.cpp.o
-.PHONY : src/game.o
+src/gmock-all.o: src/gmock-all.cc.o
+.PHONY : src/gmock-all.o
 
 # target to build an object file
-src/game.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/2D_game_assignment.dir/build.make CMakeFiles/2D_game_assignment.dir/src/game.cpp.o
-.PHONY : src/game.cpp.o
+src/gmock-all.cc.o:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+.PHONY : src/gmock-all.cc.o
 
-src/game.i: src/game.cpp.i
-.PHONY : src/game.i
+src/gmock-all.i: src/gmock-all.cc.i
+.PHONY : src/gmock-all.i
 
 # target to preprocess a source file
-src/game.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/2D_game_assignment.dir/build.make CMakeFiles/2D_game_assignment.dir/src/game.cpp.i
-.PHONY : src/game.cpp.i
+src/gmock-all.cc.i:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.i
+.PHONY : src/gmock-all.cc.i
 
-src/game.s: src/game.cpp.s
-.PHONY : src/game.s
+src/gmock-all.s: src/gmock-all.cc.s
+.PHONY : src/gmock-all.s
 
 # target to generate assembly for a file
-src/game.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/2D_game_assignment.dir/build.make CMakeFiles/2D_game_assignment.dir/src/game.cpp.s
-.PHONY : src/game.cpp.s
+src/gmock-all.cc.s:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.s
+.PHONY : src/gmock-all.cc.s
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+src/gmock_main.o: src/gmock_main.cc.o
+.PHONY : src/gmock_main.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/2D_game_assignment.dir/build.make CMakeFiles/2D_game_assignment.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/gmock_main.cc.o:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+.PHONY : src/gmock_main.cc.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
-
-# target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/2D_game_assignment.dir/build.make CMakeFiles/2D_game_assignment.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
-
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/2D_game_assignment.dir/build.make CMakeFiles/2D_game_assignment.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
-
-tests/test_game.o: tests/test_game.cpp.o
-.PHONY : tests/test_game.o
-
-# target to build an object file
-tests/test_game.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_tests.dir/build.make CMakeFiles/game_tests.dir/tests/test_game.cpp.o
-.PHONY : tests/test_game.cpp.o
-
-tests/test_game.i: tests/test_game.cpp.i
-.PHONY : tests/test_game.i
+src/gmock_main.i: src/gmock_main.cc.i
+.PHONY : src/gmock_main.i
 
 # target to preprocess a source file
-tests/test_game.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_tests.dir/build.make CMakeFiles/game_tests.dir/tests/test_game.cpp.i
-.PHONY : tests/test_game.cpp.i
+src/gmock_main.cc.i:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.i
+.PHONY : src/gmock_main.cc.i
 
-tests/test_game.s: tests/test_game.cpp.s
-.PHONY : tests/test_game.s
+src/gmock_main.s: src/gmock_main.cc.s
+.PHONY : src/gmock_main.s
 
 # target to generate assembly for a file
-tests/test_game.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/game_tests.dir/build.make CMakeFiles/game_tests.dir/tests/test_game.cpp.s
-.PHONY : tests/test_game.cpp.s
+src/gmock_main.cc.s:
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(MAKE) $(MAKESILENT) -f _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.s
+.PHONY : src/gmock_main.cc.s
 
 # Help Target
 help:
@@ -323,21 +249,14 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... 2D_game_assignment"
-	@echo "... game_tests"
 	@echo "... gmock"
 	@echo "... gmock_main"
-	@echo "... gtest"
-	@echo "... gtest_main"
-	@echo "... src/game.o"
-	@echo "... src/game.i"
-	@echo "... src/game.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... tests/test_game.o"
-	@echo "... tests/test_game.i"
-	@echo "... tests/test_game.s"
+	@echo "... src/gmock-all.o"
+	@echo "... src/gmock-all.i"
+	@echo "... src/gmock-all.s"
+	@echo "... src/gmock_main.o"
+	@echo "... src/gmock_main.i"
+	@echo "... src/gmock_main.s"
 .PHONY : help
 
 
@@ -349,6 +268,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd "/Users/cristina/Desktop/C++ folder game/2D-game" && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

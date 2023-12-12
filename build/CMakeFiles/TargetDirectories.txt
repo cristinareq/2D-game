@@ -1,3 +1,0 @@
-/Users/cristina/Desktop/C++ folder game/2D-game/build/CMakeFiles/2D_game_assignment.dir
-/Users/cristina/Desktop/C++ folder game/2D-game/build/CMakeFiles/edit_cache.dir
-/Users/cristina/Desktop/C++ folder game/2D-game/build/CMakeFiles/rebuild_cache.dir

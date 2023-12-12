@@ -1,0 +1,3 @@
+/Users/cristina/Desktop/C++ folder game/2D-game/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
+/Users/cristina/Desktop/C++ folder game/2D-game/_deps/googletest-subbuild/CMakeFiles/edit_cache.dir
+/Users/cristina/Desktop/C++ folder game/2D-game/_deps/googletest-subbuild/CMakeFiles/rebuild_cache.dir
