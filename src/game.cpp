@@ -632,13 +632,18 @@ void Game::render()
 
 void Game::spawnNewGhost()
 {
-    float x, y;
-    do
+    if (ghosts.size() < MAX_GHOSTS)
     {
-        x = distX(rng);
-        y = distY(rng);
-    } while (!isValidPosition(x, y));
-    ghosts.emplace_back(x, y, ghostTexture);
+        float x, y;
+        do
+        {
+            x = distX(rng);
+            y = distY(rng);
+        } while (!isValidPosition(x, y));
+
+        // Add the new ghost to the list
+        ghosts.emplace_back(x, y, ghostTexture);
+    }
 }
 
 void Game::spawnNewBomb()

@@ -94,6 +94,7 @@ private:
     static const float RADIUS;
 
     static const sf::Time BombSpawnInterval; // Only declaration
+    static const int MAX_GHOSTS = 8;         // This sets the maximum number of ghosts to 10
 
     bool rightPressed;
     bool leftPressed;
