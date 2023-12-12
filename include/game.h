@@ -60,6 +60,9 @@ private:
     sf::Texture ghostTexture;
     std::vector<Ghost> ghosts;
 
+    sf::Clock ghostSpawnClock;
+    sf::Time nextGhostSpawnTime;
+
     std::vector<Bomb> bombs;
     sf::Texture bombTexture;
     sf::Clock bombSpawnClock;
@@ -123,6 +126,7 @@ private:
     void spawnNewBomb();
     int initGhostTexture();
     int initBombTexture();
+    void setNextGhostSpawnTime();
     bool isValidPosition(float x, float y);
     void resetMovementFlags();
     void endGame();

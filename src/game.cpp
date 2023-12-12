@@ -53,7 +53,7 @@ const std::string Game::FONT_PATH = "arial.ttf";
 static const sf::Time BombSpawnInterval;
 const sf::Time Game::BombSpawnInterval = sf::seconds(15.0f);
 
-Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), ghostsEaten(0), wallCollisions(0) // Initialize wallCollisions
+Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), ghostsEaten(0), wallCollisions(0)
 {
     initWindow();
     initBackground();
@@ -61,15 +61,22 @@ Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), g
     initGhostTexture();
     initGhosts();
     initBombs();
-    initTimer(); // Initialize the timer
+    initTimer();
+    setNextGhostSpawnTime();
 
     player.setPosition(PLAYER_START_X, PLAYER_START_Y);
 
+    // Movement flags
     rightPressed = false;
-
     leftPressed = false;
     upPressed = false;
     downPressed = false;
+
+    // Movement block flags
+    leftBlocked = false;
+    rightBlocked = false;
+    upBlocked = false;
+    downBlocked = false;
 }
 
 Bomb::Bomb(float x, float y, const sf::Texture &texture) : x(x), y(y)
@@ -86,7 +93,11 @@ void Bomb::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
 }
-
+void Game::setNextGhostSpawnTime()
+{
+    std::uniform_real_distribution<float> dist(1.0f, 5.0f); // Random time between 5 and 15 seconds
+    nextGhostSpawnTime = sf::seconds(dist(rng));
+}
 void Ghost::updateghost(float maxX, float maxY, const std::vector<sf::FloatRect> &walls, std::mt19937 &rng, sf::Time elapsedTime)
 {
     moveTimer += elapsedTime;
@@ -259,6 +270,12 @@ void Game::update()
             endGame(); // End the game if there's a collision
             return;    // No need to run the rest of the update code since the game will end
         }
+    }
+    if (ghostSpawnClock.getElapsedTime() >= nextGhostSpawnTime)
+    {
+        spawnNewGhost();           // Spawn a new ghost
+        ghostSpawnClock.restart(); // Restart the clock for the next spawn
+        setNextGhostSpawnTime();   // Set a new random time for the next ghost to spawn
     }
     // Spawn bombs every 30 seconds
     if (bombSpawnClock.getElapsedTime() >= BombSpawnInterval)
@@ -466,7 +483,7 @@ void Game::update()
         if (player.getGlobalBounds().intersects(it->sprite.getGlobalBounds()))
         {
             it = ghosts.erase(it);
-            spawnNewGhost();
+
             ghostsEaten++; // Increment the count
         }
         else
