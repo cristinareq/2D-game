@@ -1,4 +1,3 @@
-
 #include "game.h"
 #include <iostream>
 #include <random>
@@ -164,14 +163,20 @@ int Game::initPlayer()
 
 void Game::initGhosts()
 {
-    for (int i = 0; i < 6; ++i)
+    std::random_device rd;                       // Obtain a random number from hardware
+    std::mt19937 eng(rd());                      // Seed the generator
+    std::uniform_int_distribution<> distr(2, 6); // Define the range
+
+    int numberOfGhosts = distr(eng); // Generate a random number between 1 and 6
+
+    for (int i = 0; i < numberOfGhosts; ++i)
     {
         float x, y;
         do
         {
             x = distX(rng);
             y = distY(rng);
-        } while (!isValidPosition(x, y)); // Updated to a new method
+        } while (!isValidPosition(x, y)); // Ensure the position is valid for the ghost
         ghosts.emplace_back(x, y, ghostTexture);
     }
 }
@@ -192,15 +197,19 @@ void Game::initTimer()
 void Game::update()
 {
     sf::Time elapsedTime = gameClock.restart();
-
     updateTimer();
 
     float speed = 3.0f;
-
+    if (wallCollisions >= 3)
+    {
+        endGame();
+        return;
+    }
     bool leftWallCollision = false;
     bool rightWallCollision = false;
     bool upWallCollision = false;
     bool downWallCollision = false;
+    bool collisionOccurred = false;
 
     bool newCollision = false;
 
@@ -416,15 +425,15 @@ void Game::update()
     if (newCollision)
     {
         wallCollisions++;
-        if (wallCollisions >= 3)
-        {
-            update();
-            render();
-            sf::sleep(sf::seconds(0.5));
+    }
+    if (wallCollisions >= 3)
+    {
+        update();
+        render();
+        sf::sleep(sf::seconds(0.5));
 
-            endGame();
-            return;
-        }
+        endGame();
+        return;
     }
 }
 
