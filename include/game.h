@@ -13,6 +13,23 @@ enum class Direction
     Down
 };
 
+class Bomb
+{
+public:
+    float x, y;
+    sf::Sprite sprite;
+
+    Bomb(float x, float y, const sf::Texture &texture);
+
+    void draw(sf::RenderWindow &window);
+
+private:
+    std::vector<Bomb> bombs;
+    sf::Texture bombTexture;
+    sf::Clock bombSpawnClock;
+    static const sf::Time BombSpawnInterval;
+};
+
 class Ghost
 {
 public:
@@ -43,6 +60,10 @@ private:
     sf::Texture ghostTexture;
     std::vector<Ghost> ghosts;
 
+    std::vector<Bomb> bombs;
+    sf::Texture bombTexture;
+    sf::Clock bombSpawnClock;
+
     sf::Sprite endGameBackground;
     sf::Texture endGameBackgroundTexture;
     bool gameEnded = false;
@@ -69,6 +90,8 @@ private:
     static const float PLAYER_START_Y;
     static const float RADIUS;
 
+    static const sf::Time BombSpawnInterval; // Only declaration
+
     bool rightPressed;
     bool leftPressed;
     bool upPressed;
@@ -93,10 +116,13 @@ private:
     void update();
     void render();
     void initGhosts();
+    void initBombs();
     void initTimer();
     void updateTimer();
     void spawnNewGhost();
+    void spawnNewBomb();
     int initGhostTexture();
+    int initBombTexture();
     bool isValidPosition(float x, float y);
     void resetMovementFlags();
     void endGame();

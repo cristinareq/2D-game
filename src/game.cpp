@@ -16,6 +16,7 @@ void Ghost::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
 }
+
 class Wall
 {
 public:
@@ -49,6 +50,8 @@ const float Game::PLAYER_START_Y = 400.0f;
 const float Game::RADIUS = 20.0f;
 const sf::Time Game::UpdateInterval = sf::seconds(1.0f);
 const std::string Game::FONT_PATH = "arial.ttf";
+static const sf::Time BombSpawnInterval;
+const sf::Time Game::BombSpawnInterval = sf::seconds(15.0f);
 
 Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), ghostsEaten(0), wallCollisions(0) // Initialize wallCollisions
 {
@@ -57,6 +60,7 @@ Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), g
     initPlayer();
     initGhostTexture();
     initGhosts();
+    initBombs();
     initTimer(); // Initialize the timer
 
     player.setPosition(PLAYER_START_X, PLAYER_START_Y);
@@ -67,6 +71,22 @@ Game::Game() : rng(rd()), distX(0.0f, SCENE_WIDTH), distY(0.0f, SCENE_HEIGHT), g
     upPressed = false;
     downPressed = false;
 }
+
+Bomb::Bomb(float x, float y, const sf::Texture &texture) : x(x), y(y)
+{
+    sprite.setTexture(texture);
+    float originalWidth = sprite.getLocalBounds().width;
+    float originalHeight = sprite.getLocalBounds().height;
+    float desiredSize = 40.0f;                                                  // Assuming you want the bomb size to match the ghost size
+    sprite.setScale(desiredSize / originalWidth, desiredSize / originalHeight); // Scale the sprite
+    sprite.setPosition(x, y);
+}
+
+void Bomb::draw(sf::RenderWindow &window)
+{
+    window.draw(sprite);
+}
+
 void Ghost::updateghost(float maxX, float maxY, const std::vector<sf::FloatRect> &walls, std::mt19937 &rng, sf::Time elapsedTime)
 {
     moveTimer += elapsedTime;
@@ -130,6 +150,14 @@ int Game::initGhostTexture()
     }
     return 0; // Successfully loaded
 }
+int Game::initBombTexture()
+{
+    if (!bombTexture.loadFromFile("resources/bomb.png"))
+    {
+        return 1; // Error loading texture
+    }
+    return 0; // Successfully loaded
+}
 int Game::initWindow()
 {
     window.create(sf::VideoMode(SCENE_WIDTH, SCENE_HEIGHT), "Updated 2D Game");
@@ -181,6 +209,16 @@ void Game::initGhosts()
     }
 }
 
+void Game::initBombs()
+{
+    if (!bombTexture.loadFromFile("resources/bomb.png"))
+    {
+        std::cerr << "Failed to load bomb texture" << std::endl;
+        // Handle the error
+    }
+    bombSpawnClock.restart();
+}
+
 void Game::initTimer()
 {
     if (!font.loadFromFile("arial.ttf"))
@@ -214,7 +252,21 @@ void Game::update()
     bool newCollision = false;
 
     sf::FloatRect playerBounds = player.getGlobalBounds();
-
+    for (const auto &bomb : bombs)
+    {
+        if (playerBounds.intersects(bomb.sprite.getGlobalBounds()))
+        {
+            endGame(); // End the game if there's a collision
+            return;    // No need to run the rest of the update code since the game will end
+        }
+    }
+    // Spawn bombs every 30 seconds
+    if (bombSpawnClock.getElapsedTime() >= BombSpawnInterval)
+    {
+        spawnNewBomb();
+        bombSpawnClock.restart();
+        std::cout << "A new bomb has been spawned!" << std::endl;
+    }
     // Check for border collisions
     if (player.getPosition().x - RADIUS <= 0)
     {
@@ -544,6 +596,11 @@ void Game::render()
         }
 
         window.draw(player);
+
+        for (auto &bomb : bombs)
+        {
+            bomb.draw(window);
+        }
     }
     else
     {
@@ -565,6 +622,17 @@ void Game::spawnNewGhost()
         y = distY(rng);
     } while (!isValidPosition(x, y));
     ghosts.emplace_back(x, y, ghostTexture);
+}
+
+void Game::spawnNewBomb()
+{
+    float x, y;
+    do
+    {
+        x = distX(rng);
+        y = distY(rng);
+    } while (!isValidPosition(x, y));
+    bombs.emplace_back(x, y, bombTexture); // Changed from ghostTexture to bombTexture
 }
 
 bool Game::isValidPosition(float x, float y)
