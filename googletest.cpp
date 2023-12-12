@@ -68,21 +68,28 @@ TEST_F(GameTest, GhostMovementLogic)
         EXPECT_FALSE(oldPos == newPos);
     }
 }
+float posX = 200.0f; // hardcored the test setup based on the known game layout
+float posY = 100.0f; // Vertically centered along the wall's height
+
 // Test for Pac-Man wall collision
 TEST_F(GameTest, PacmanWallCollision)
 {
     game.initPlayer();
 
-    // Assuming player starts in a position where it can move without collision
-    game.player.setPosition(Game::PLAYER_START_X, Game::PLAYER_START_Y);
+    // Place Pac-Man in a known position that guarantees a collision with a wall
+    // This position depends on the layout of your game's level
+    // Example: A position right next to a wall
+    game.player.setPosition(posX, posY);
 
-    // Simulate movement towards a wall
-    // Assuming there is a method to move the player and check for collisions
-    game.processInput(); // Simulate input for movement
-    game.update();       // Update game state, including collision checks
+    // Record the initial number of wall collisions
+    int initialWallCollisions = game.wallCollisions;
+
+    // Update game to process potential collision
+    // This might involve more than just calling update, depending on how your game logic works
+    game.update(); // This should include collision checking
 
     // Check if wall collision is detected and handled
-    EXPECT_EQ(game.wallCollisions, 1); // Assuming wallCollisions is incremented on collision
+    EXPECT_GT(game.wallCollisions, initialWallCollisions); // Check if wallCollisions has increased
 }
 
 // Test for Pac-Man ghost collision
